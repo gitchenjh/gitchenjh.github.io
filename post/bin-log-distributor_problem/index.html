@@ -1,22 +1,110 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://gitchenjh.github.io/</id>
-    <title>gitchenjh 博客</title>
-    <updated>2019-07-15T03:17:35.732Z</updated>
-    <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://gitchenjh.github.io/"/>
-    <link rel="self" href="https://gitchenjh.github.io//atom.xml"/>
-    <subtitle>gitchenjh 博客</subtitle>
-    <logo>https://gitchenjh.github.io//images/avatar.png</logo>
-    <icon>https://gitchenjh.github.io//favicon.ico</icon>
-    <rights>All rights reserved 2019, gitchenjh 博客</rights>
-    <entry>
-        <title type="html"><![CDATA[bin-log-distributor消费数据丢失问题解决记录]]></title>
-        <id>https://gitchenjh.github.io//post/bin-log-distributor_problem</id>
-        <link href="https://gitchenjh.github.io//post/bin-log-distributor_problem">
-        </link>
-        <updated>2018-10-22T03:02:56.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="bin-log-distributor项目简介">bin-log-distributor项目简介</h2>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>bin-log-distributor消费数据丢失问题解决记录 | gitchenjh 博客</title>
+<meta name="description" content="gitchenjh 博客">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://gitchenjh.github.io//favicon.ico?v=1563160575061">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://gitchenjh.github.io//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://gitchenjh.github.io/">
+        <img src="https://gitchenjh.github.io//images/avatar.png?v=1563160575061" class="site-logo">
+        <h1 class="site-title">gitchenjh 博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+          <a class="social-link" href="https://github.com/gitchenjh" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+      
+        
+          <a class="social-link" href="https://weibo.com/chenjinghua322" target="_blank">
+            <i class="fab fa-weibo"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      gitchenjh 博客
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://gitchenjh.github.io//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">bin-log-distributor消费数据丢失问题解决记录</h2>
+            <div class="post-date">2018-10-22</div>
+            
+            <div class="post-content">
+              <h2 id="bin-log-distributor项目简介">bin-log-distributor项目简介</h2>
 <p>bin-log-distributor是凯京科技开源的Mysql数据库数据变动实时监听分发中间件，详情见<a href="https://gitee.com/kekingcn/keking-binlog-distributor">码云开源地址</a>, <a href="https://github.com/kekingcn/keking-binlog-distributor">github开源地址</a></p>
 <h2 id="背景">背景</h2>
 <p>线上反馈有bin-log-distributor客户端偶尔有丢失数据的情况。</p>
@@ -125,6 +213,54 @@
 <h2 id="架构组招聘">架构组招聘</h2>
 <p>目前架构组还有一个虚位以待，欢迎志同道合的你来和我们一起交流。简历可发送至邮箱：<br>
 chenkailing@keking.cn</p>
-]]></content>
-    </entry>
-</feed>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://gitchenjh.github.io//tag/FU_pMI3Ui" class="tag">
+                    binlog
+                  </a>
+                
+                  <a href="https://gitchenjh.github.io//tag/CkoBrgrsvs" class="tag">
+                    中间件
+                  </a>
+                
+                  <a href="https://gitchenjh.github.io//tag/VRbvHKSJS5" class="tag">
+                    线上问题
+                  </a>
+                
+              </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>
