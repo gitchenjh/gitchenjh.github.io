@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://gitchenjh.github.io/</id>
     <title>gitchenjh 博客</title>
-    <updated>2019-07-19T03:29:15.464Z</updated>
+    <updated>2019-07-19T04:59:10.589Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://gitchenjh.github.io/"/>
     <link rel="self" href="https://gitchenjh.github.io//atom.xml"/>
@@ -41,7 +41,7 @@
 <p>ip-rule规则通过时间窗口统计当前时间窗口内请求数，小于规定的最大请求数则可通过，否则不通过。时间窗口、最大请求数、ip白名单等均可配置</p>
 <h3 id="ua-rule">ua-rule</h3>
 <p>ua-rule规则通过判断请求携带的User-Agent，得到操作系统、设备信息、浏览器信息的，可配置各种维度对请求进行过滤</p>
-<h2 id="4-接入作用">4. 接入作用</h2>
+<h2 id="4-接入使用">4. 接入使用</h2>
 <p>后端接入非常简单，只需要引用kk-anti-reptile的maven依赖，并配置过滤即可<br>
 加入maven依赖</p>
 <pre><code class="language-xml">&lt;dependency&gt;
