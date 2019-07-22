@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://gitchenjh.github.io/</id>
     <title>gitchenjh 博客</title>
-    <updated>2019-07-22T02:06:37.452Z</updated>
+    <updated>2019-07-22T02:15:18.507Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://gitchenjh.github.io/"/>
     <link rel="self" href="https://gitchenjh.github.io//atom.xml"/>
@@ -162,8 +162,8 @@ spring.redisson.password=xxx
 <tr>
 <td>ua-rule.allowed-proxy</td>
 <td>是否允许代理访问</td>
-<td>true</td>
-<td>true</td>
+<td>false</td>
+<td>false</td>
 </tr>
 </tbody>
 </table>
