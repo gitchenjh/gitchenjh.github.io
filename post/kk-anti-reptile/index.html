@@ -9,7 +9,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://gitchenjh.github.io//favicon.ico?v=1563760664983">
+<link rel="shortcut icon" href="https://gitchenjh.github.io//favicon.ico?v=1563760873541">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://gitchenjh.github.io//styles/main.css">
 
@@ -30,7 +30,7 @@
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://gitchenjh.github.io/">
-        <img src="https://gitchenjh.github.io//images/avatar.png?v=1563760664983" class="site-logo">
+        <img src="https://gitchenjh.github.io//images/avatar.png?v=1563760873541" class="site-logo">
         <h1 class="site-title">gitchenjh 博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -117,9 +117,9 @@
 <p>Filter调用则链进行请求过滤，如过滤不通过，则拦截请求，返回状态码<code>509</code>，并输出验证码输入页面，输出验证码正确后，调用过滤规则链对规则进行重置</p>
 <p>目前规则链中有如下两个规则</p>
 <h3 id="ip-rule">ip-rule</h3>
-<p>ip-rule规则通过时间窗口统计当前时间窗口内请求数，小于规定的最大请求数则可通过，否则不通过。时间窗口、最大请求数、ip白名单等均可配置</p>
+<p>ip-rule通过时间窗口统计当前时间窗口内请求数，小于规定的最大请求数则可通过，否则不通过。时间窗口、最大请求数、ip白名单等均可配置</p>
 <h3 id="ua-rule">ua-rule</h3>
-<p>ua-rule规则通过判断请求携带的User-Agent，得到操作系统、设备信息、浏览器信息的，可配置各种维度对请求进行过滤</p>
+<p>ua-rule通过判断请求携带的User-Agent，得到操作系统、设备信息、浏览器信息等，可配置各种维度对请求进行过滤</p>
 <h2 id="4-接入使用">4. 接入使用</h2>
 <p>后端接入非常简单，只需要引用kk-anti-reptile的maven依赖，并配置启用kk-anti-reptile即可<br>
 加入maven依赖</p>
