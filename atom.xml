@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://gitchenjh.github.io/</id>
     <title>gitchenjh 博客</title>
-    <updated>2019-07-22T02:15:18.507Z</updated>
+    <updated>2019-07-23T01:58:33.736Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://gitchenjh.github.io/"/>
     <link rel="self" href="https://gitchenjh.github.io//atom.xml"/>
@@ -100,7 +100,7 @@ spring.redisson.password=xxx
 <td>true</td>
 </tr>
 <tr>
-<td>includeUrls</td>
+<td>include-urls</td>
 <td>需要反爬的接口列表，以'/'开头，以','分隔</td>
 <td>空</td>
 <td>/client,/user</td>
