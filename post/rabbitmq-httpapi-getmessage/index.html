@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>RabbitMQ通过HTTP API获取队列消息内容 | gitchenjh 博客</title>
 <meta name="description" content="" />
-<link rel="shortcut icon" href="https://gitchenjh.github.io/favicon.ico?v=1565151045920">
+<link rel="shortcut icon" href="https://gitchenjh.github.io/favicon.ico?v=1565153380689">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://gitchenjh.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://gitchenjh.github.io">
-  <img class="avatar" src="https://gitchenjh.github.io/images/avatar.png?v=1565151045920" alt="">
+  <img class="avatar" src="https://gitchenjh.github.io/images/avatar.png?v=1565153380689" alt="">
   </a>
   <h1 class="site-title">
     gitchenjh 博客
@@ -119,9 +119,9 @@
 <p>要在前端实现显示rabbitmq队列及队列内容，有如下两种实现方案：</p>
 <ul>
 <li>后端主服务使用rabbitmq客户端，使用amqpadmin读取当前vhost下队列列表，注册消费方，消费队列且不发送ACK确认，让其重新入队列</li>
-<li>后端主服务通过rabbitmq提供的HTTP API直接获取队列列表，和队列中的内容（rabbitmq前台管理页面就是通过HTTP API获取的队列列表和获取队列内消息）<br>
-对比两种方案，发现前者存在两点劣势：</li>
+<li>后端主服务通过rabbitmq提供的HTTP API直接获取队列列表，和队列中的内容（rabbitmq前台管理页面就是通过HTTP API获取的队列列表和获取队列内消息）</li>
 </ul>
+<p>对比两种方案，发现前者存在两点劣势：</p>
 <ol>
 <li>主服务需要额外依赖rabbitmq客户端，且ampqadmin需要有管理员权限的账号和密码</li>
 <li>主服务需要和业务系统同时消费队列数据，编码不当可能给整个系统带来稳定性问题，且消费数据不发送ACK确认应答不太合理<br>
