@@ -4,10 +4,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>bin-log-distributor消费数据丢失问题解决记录 | gitchenjh 博客</title>
 <meta name="description" content="" />
-<link rel="shortcut icon" href="https://gitchenjh.github.io//favicon.ico?v=1565143473761">
+<link rel="shortcut icon" href="https://gitchenjh.github.io/favicon.ico?v=1565148072802">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
-<link rel="stylesheet" href="https://gitchenjh.github.io//styles/main.css">
+<link rel="stylesheet" href="https://gitchenjh.github.io/styles/main.css">
 
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
@@ -19,8 +19,8 @@
     <div class="main">
       <div class="main-content">
         <div class="site-header">
-  <a href="https://gitchenjh.github.io/">
-  <img class="avatar" src="https://gitchenjh.github.io//images/avatar.png?v=1565143473761" alt="">
+  <a href="https://gitchenjh.github.io">
+  <img class="avatar" src="https://gitchenjh.github.io/images/avatar.png?v=1565148072802" alt="">
   </a>
   <h1 class="site-title">
     gitchenjh 博客
@@ -95,15 +95,15 @@
                 2 min read
               </span>
               
-                <a href="https://gitchenjh.github.io//tag/FU_pMI3Ui" class="post-tag">
+                <a href="https://gitchenjh.github.io/tag/FU_pMI3Ui" class="post-tag">
                   # binlog
                 </a>
               
-                <a href="https://gitchenjh.github.io//tag/CkoBrgrsvs" class="post-tag">
+                <a href="https://gitchenjh.github.io/tag/CkoBrgrsvs" class="post-tag">
                   # 中间件
                 </a>
               
-                <a href="https://gitchenjh.github.io//tag/VRbvHKSJS5" class="post-tag">
+                <a href="https://gitchenjh.github.io/tag/VRbvHKSJS5" class="post-tag">
                   # 线上问题
                 </a>
               
@@ -124,9 +124,9 @@
 将客户端日志打印更仔细，发现以下两点问题：</p>
 <ol>
 <li>从redis队列peek数据后，remove抛出如下异常：<br>
-<img src="https://gitchenjh.github.io//post-images/1563160157405.jpg" alt=""></li>
+<img src="https://gitchenjh.github.io/post-images/1563160157405.jpg" alt=""></li>
 <li>Redis队列数据没消费完其他线程异常进行了消费：<br>
-<img src="https://gitchenjh.github.io//post-images/1563160179721.jpg" alt=""></li>
+<img src="https://gitchenjh.github.io/post-images/1563160179721.jpg" alt=""></li>
 </ol>
 <p>分析如下消费redis数据方法源码：</p>
 <pre><code class="language-java">private void doRunWithLock() {
@@ -160,7 +160,7 @@
 }
 </code></pre>
 <p>猜测是redis RLock并没有效，于是在rLock.tryLock() 和 rLock.delete() 方法后面分别打印出 acquireLock 和 releaseLock的日志，再次执行测试，得到如下日志：<br>
-<img src="https://gitchenjh.github.io//post-images/1563160191203.jpg" alt=""></p>
+<img src="https://gitchenjh.github.io/post-images/1563160191203.jpg" alt=""></p>
 <p>发现 pool-2-thread-1线程成功获取锁后，pool-2-thread-2获取锁失败，并立刻将pool-2-thread-1 持有的锁release了。结合源码发现pool-2-thread-2获取锁失败后，执行了finally代码块中的rLock.forceUnlock()方法，查阅资料发现forceUnlock()方法可以直接释放相同key的其他线程持有的锁。</p>
 <p>至此，定位到问题为：每次收到数据起一个线程执行doRunWithLock()方法，当数据库操作较频繁时，一个线程获取到的redis锁会被另一个线程release掉，导致redis锁内部本来应该是单例执行的消费redis队列数据变成了多个线程同时执行，从而出现多个线程消费队列数据冲突，引发数据丢失和重复消费的问题。</p>
 <h2 id="解决">解决</h2>
@@ -206,7 +206,7 @@
 </code></pre>
 <h2 id="回归">回归</h2>
 <p>更改后执行继续执行相同的测试用例，得到如下结果日志：<br>
-<img src="https://gitchenjh.github.io//post-images/1563160200151.jpg" alt=""></p>
+<img src="https://gitchenjh.github.io/post-images/1563160200151.jpg" alt=""></p>
 <p>pool-2-thread-2在获取到redis锁之后一直持续消费redis队列中的数据，其他线程尝试获取redis锁失败后，不再强制release该锁，客户端消费条数、类型结果正确。</p>
 <h2 id="完成">完成</h2>
 <p>修改测试用例，使用更多线程、执行更多数据库操作，分析消费结果，结果数据条数正确，未出现数据丢失、重复消费等问题。<br>
@@ -214,7 +214,7 @@
 <h2 id="作者简介">作者简介</h2>
 <p>陈精华，2018年8月加入凯京科技。任职java开发工程师，参与凯京科技统一支付平台、结算平台设计和开发，负责凯京科技开源中间件开发与维护。</p>
 <p>欢迎加入凯京开源技术QQ群：613025121，和我们一起交流互联网应用的技术架构落地实践<br>
-<img src="https://gitchenjh.github.io//post-images/1563160245009.png" alt=""></p>
+<img src="https://gitchenjh.github.io/post-images/1563160245009.png" alt=""></p>
 <h2 id="关于架构运维部">关于架构&amp;运维部</h2>
 <p>凯京研发中心架构&amp;运维部的工作主要分两大部分，架构部分主要负责框架中间件的研究，如dubbo、apollo、skywalking、xxljob、分布式事务等、公司内<a href="https://gitee.com/kekingcn">开源项目</a>以及公共服务公共组件的研发维护、新技术的引进以及落地等。运维部分主要负责devops系统研发以及k8s容器环境的维护等工作。</p>
 <h2 id="架构组招聘">架构组招聘</h2>
@@ -252,7 +252,7 @@ chenkailing@keking.cn</p>
 
         <div class="site-footer">
    | 
-  <a class="rss" href="https://gitchenjh.github.io//atom.xml" target="_blank">RSS</a>
+  <a class="rss" href="https://gitchenjh.github.io/atom.xml" target="_blank">RSS</a>
 </div>
 
 <script>

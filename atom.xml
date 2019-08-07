@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://gitchenjh.github.io/</id>
+    <id>https://gitchenjh.github.io</id>
     <title>gitchenjh 博客</title>
-    <updated>2019-08-07T02:06:08.326Z</updated>
+    <updated>2019-08-07T03:21:16.644Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://gitchenjh.github.io/"/>
-    <link rel="self" href="https://gitchenjh.github.io//atom.xml"/>
-    <logo>https://gitchenjh.github.io//images/avatar.png</logo>
-    <icon>https://gitchenjh.github.io//favicon.ico</icon>
+    <link rel="alternate" href="https://gitchenjh.github.io"/>
+    <link rel="self" href="https://gitchenjh.github.io/atom.xml"/>
+    <logo>https://gitchenjh.github.io/images/avatar.png</logo>
+    <icon>https://gitchenjh.github.io/favicon.ico</icon>
     <rights>All rights reserved 2019, gitchenjh 博客</rights>
     <entry>
         <title type="html"><![CDATA[适用于spring-boot项目的反爬虫组件kk-anti-reptile]]></title>
-        <id>https://gitchenjh.github.io//post/kk-anti-reptile</id>
-        <link href="https://gitchenjh.github.io//post/kk-anti-reptile">
+        <id>https://gitchenjh.github.io/post/kk-anti-reptile</id>
+        <link href="https://gitchenjh.github.io/post/kk-anti-reptile">
         </link>
         <updated>2019-07-19T03:03:55.000Z</updated>
     </entry>
     <entry>
         <title type="html"><![CDATA[bin-log-distributor消费数据丢失问题解决记录]]></title>
-        <id>https://gitchenjh.github.io//post/bin-log-distributor_problem</id>
-        <link href="https://gitchenjh.github.io//post/bin-log-distributor_problem">
+        <id>https://gitchenjh.github.io/post/bin-log-distributor_problem</id>
+        <link href="https://gitchenjh.github.io/post/bin-log-distributor_problem">
         </link>
         <updated>2018-10-22T03:02:56.000Z</updated>
     </entry>
