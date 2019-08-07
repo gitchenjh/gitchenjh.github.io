@@ -1,0 +1,329 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>kkbida - 开源消息投递中间件详细解析 | gitchenjh 博客</title>
+<meta name="description" content="" />
+<link rel="shortcut icon" href="https://gitchenjh.github.io/favicon.ico?v=1565151045920">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://gitchenjh.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://gitchenjh.github.io">
+  <img class="avatar" src="https://gitchenjh.github.io/images/avatar.png?v=1565151045920" alt="">
+  </a>
+  <h1 class="site-title">
+    gitchenjh 博客
+  </h1>
+  <p class="site-description">
+    
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/gitchenjh" target="_blank">
+          <i class="fab fa-github"></i>
+        </a>
+      
+    
+      
+    
+      
+        <a href="https://weibo.com/chenjinghua322" target="_blank">
+          <i class="fab fa-weibo"></i>
+        </a>
+      
+    
+      
+        <a href="https://www.zhihu.com/people/gitchenjh" target="_blank">
+          <i class="fab fa-zhihu"></i>
+        </a>
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              kkbida - 开源消息投递中间件详细解析
+            </h2>
+            <div class="post-info">
+              <span>
+                2019-03-15
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="项目简介">项目简介</h2>
+<p>kkbida为凯京科技开源的消息投递中间件，谐音<code>必达</code>，旨在保证异构系统间消息通知时消息投递必达，详情见 <a href="https://gitee.com/kekingcn/kkbida">开源地址</a></p>
+<h2 id="快速开始">快速开始</h2>
+<p>从gitee拉取代码</p>
+<pre><code class="language-bash">git clone https://gitee.com/kekingcn/kkbida
+</code></pre>
+<p>准备一个mysql数据库和redis，修改kk-callcenter-main模块中的 application.properties 配置文件的连接信息</p>
+<p>使用maven构建</p>
+<pre><code class="language-bash">cd kkbida
+mvn clean install -DskipTests
+</code></pre>
+<p>运行</p>
+<pre><code class="language-bash">cd kkbida/kk-callcenter-main/target
+java -jar kk-callcenter-main-1.0.0-SNAPSHOT.jar
+</code></pre>
+<p>浏览器访问 http://127.0.0.1:8080 即可 用户名/密码：admin/admin</p>
+<h2 id="功能介绍">功能介绍</h2>
+<p>kkbida目前提供<code>首页统计图表</code>、<code>历史任务</code>、<code>待处理任务</code>、<code>失败通知管理</code>四个功能模块</p>
+<ul>
+<li><code>首页统计图表</code>可查看消息总数、成功、失败数和最近一周的每天的统计数据</li>
+<li><code>历史任务</code>提供查看历史任务记录和执行情况功能，对于执行失败的任务，提供手动补偿执行功能</li>
+<li><code>待处理任务</code>提供查看队列中待处理的任务记录情况（包括距下次执行还剩多少时间），同时提供直接手动提前执行功能</li>
+<li><code>失败通知管理</code>即webhook通知，当消息发送失败次数达到重试限制次数，kkbida会触发webhook发起失败通知，支持包括钉钉、企业微信等各种带webhook功能的平台，详细配置见：<a href="https://gitee.com/kekingcn/kkbida#%E5%9B%9E%E8%B0%83%E5%A4%B1%E8%B4%A5%E9%80%9A%E7%9F%A5">配置</a></li>
+</ul>
+<h2 id="原理解析">原理解析</h2>
+<p>系统架构详见：<a href="https://gitee.com/kekingcn/kkbida#%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84">架构</a> 的说明和架构图<br>
+<img src="https://gitchenjh.github.io/post-images/1565150496172.png" alt=""><br>
+下面从<code>代码总体结构</code>、<code>sdk</code>、<code>任务队列处理</code>、<code>webhook</code>四个方面详细解析</p>
+<h3 id="1-代码总体结构">1. 代码总体结构</h3>
+<p>从gitee拉取代码使用idea导入后，看到代码结构如下<br>
+<img src="https://gitchenjh.github.io/post-images/1565150542337.jpg" alt=""><br>
+项目分为三个模块<code>kk-callcenter-main</code>、<code>kk-callcenter-sdk</code>、<code>third-party</code></p>
+<ul>
+<li><code>kk-callcenter-main</code>为主服务，向外提供dubbo和http接口服务，并提供web管理页面功能</li>
+<li><code>kk-callcenter-sdk</code>为提供给接入系统用的sdk包，通过sdk包能方便快速的向主服务发送消息任务，详细使用说明见  <a href="https://gitee.com/kekingcn/kkbida#sdk%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95">使用说明</a></li>
+<li><code>third-party</code>为<code>klock</code>（同为凯京科技开源的分布式锁组件，详见：https://gitee.com/kekingcn/spring-boot-klock-starter ）依赖</li>
+</ul>
+<h3 id="2-sdk">2. sdk</h3>
+<p>如下图所示，<code>kk-callcenter-sdk</code>提供一个<code>CallBackService</code>接口和一个<code>CallBackServiceHttpImpl</code> http 实现类（另外服务端默认提供了dubbo实现，接入时，只需要使用和服务端同一个redis注册中心，<a href="https://my.oschina.net/u/2441713">@Reference</a> CallBackService就可自动注入），同时提供一个 <code>CallBackTask</code> model类作为任务参数，并提供在任务失败的时候抛出的<code>CallBackException</code>异常类<br>
+<img src="https://gitchenjh.github.io/post-images/1565150581954.jpg" alt=""><br>
+使用详情见  <a href="https://gitee.com/kekingcn/kkbida#%E8%8E%B7%E5%8F%96callbackservice%E5%AF%B9%E8%B1%A1">获取callbackservice对象</a> 和 <a href="https://gitee.com/kekingcn/kkbida#%E8%B0%83%E7%94%A8callbackservice%E5%8F%91%E8%B5%B7%E5%9B%9E%E8%B0%83">调用callbackservice发起回调</a></p>
+<p>同时，如果需要使用其他方式接入，只需要自行实现CallBackService接口就可以</p>
+<h3 id="3-任务队列处理">3. 任务队列处理</h3>
+<p>查看<code>kk-callcenter-sdk</code>模块下<code>TaskService</code>任务处理类<a href="https://gitee.com/kekingcn/kkbida/blob/master/kk-callcenter-main/src/main/java/cn/keking/callcenter/task/TaskService.java">源码</a> 和<code>TaskDueueHadler</code>队列处理类<a href="https://github.com/kekingcn/kkbida/blob/master/kk-callcenter-main/src/main/java/cn/keking/callcenter/task/TaskDueueHandle.java">源码</a></p>
+<p><code>TaskService</code> 类提供如下两个方法</p>
+<pre><code class="language-java">/**
+* 添加延迟任务
+* @param task
+* @param delay
+* @param timeUnit
+*/
+public void addDelayTask(CallBackTask task, Long delay, TimeUnit timeUnit){
+    RBlockingQueue&lt;CallBackTask&gt; blockingQueue = client.getBlockingQueue(Constants.REDIS_QUEUE_NAME);
+    RDelayedQueue delayedQueue = client.getDelayedQueue(blockingQueue);
+    delayedQueue.offer(task,delay,timeUnit);
+}
+
+/**
+* 添加即时任务
+* @param task
+*/
+public void addTask(CallBackTask task){
+    task.setTaskId(UUID.randomUUID().toString());
+    task.setCreateDate(new Timestamp(System.currentTimeMillis()));
+    task.setLastModifiedDate(new Timestamp(System.currentTimeMillis()));
+    RBlockingQueue&lt;CallBackTask&gt; blockingQueue = client.getBlockingQueue(Constants.REDIS_QUEUE_NAME);
+    blockingQueue.addAsync(task);
+}
+</code></pre>
+<p>分别为添加延迟任务和添加即时任务</p>
+<ul>
+<li>当收到任务消息传入时，会调用<code>addTask</code>方法向redis队列添加一条即时任务</li>
+<li>当任务处理失败时，会调用<code>addDelayTask</code>方法向reids队列添加一条延时任务</li>
+</ul>
+<p><code>TaskDueueHadler</code>类通过两个线程不停地从redis队列取数据，并调用执行任务方法，如果执行失败会调用<code>TaskService</code>的<code>addDelayTask</code>，将任务重新放入队列，延时执行，直到成功或到达最大失败次数。如果到达最大失败次数会调用Webhook执行组件向配置的所有失败提醒地址推送提醒消息</p>
+<h3 id="4-webhook">4. webhook</h3>
+<p>当消息发送失败次数达到重试限制次数，kkbida会触发webhook发起失败通知</p>
+<p>查看<code>kk-callcenter-sdk</code>模块下<code>TaskService</code>任务处理类<a href="https://gitee.com/kekingcn/kkbida/blob/master/kk-callcenter-main/src/main/java/cn/keking/callcenter/component/WebHookClientComponent.java">源码</a></p>
+<pre><code class="language-java">/**
+ * @auther: chenjh
+ * @time: 2019/3/6 14:44
+ * @description
+ */
+@Component
+public class WebHookClientComponent {
+
+    private HttpClient httpclient = HttpClients.createDefault();
+
+    private static final String DINGDING_WEBHOOK_URL_PREFIX = &quot;https://oapi.dingtalk.com&quot;;
+
+    public SendResult send(WebHookPO webhook, String msgContent) throws IOException, WebHookException {
+        if (webhook == null || msgContent.trim().isEmpty()) {
+            throw new WebHookException(&quot;webhook对象或消息对象为空&quot;);
+        }
+        if (!RequestMethodEnum.POST.equals(webhook.getRequestMethod())) {
+            throw new WebHookException(&quot;暂只支持POST请求&quot;);
+        }
+        HttpPost httppost = new HttpPost(webhook.getUrl());
+        httppost.addHeader(&quot;Content-Type&quot;, webhook.getContentType());
+        StringEntity se = new StringEntity(msgContent, &quot;utf-8&quot;);
+        httppost.setEntity(se);
+        SendResult sendResult = new SendResult();
+        HttpResponse response = httpclient.execute(httppost);
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+            //钉钉消息，判断返回码
+            if (webhook.getUrl().toLowerCase().startsWith(DINGDING_WEBHOOK_URL_PREFIX)) {
+                String result = EntityUtils.toString(response.getEntity());
+                JSONObject obj = JSONObject.parseObject(result);
+                Integer errcode = obj.getInteger(&quot;errcode&quot;);
+                sendResult.setErrorCode(errcode);
+                sendResult.setErrorMsg(obj.getString(&quot;errmsg&quot;));
+                sendResult.setIsSuccess(errcode.equals(0));
+            } else {
+                sendResult.setIsSuccess(true);
+            }
+        } else {
+            sendResult.setIsSuccess(false);
+        }
+        return sendResult;
+    }
+}
+</code></pre>
+<p>通知发送组件会按失败通知（webhook）配置的参数，封装http请求，发送请求，完成webhook通知成功与否判定</p>
+<h2 id="结语">结语</h2>
+<p>读完本文，相信您已经了解kkbida应该如何使用，并了解其主要的内部设计与实现。希望kkbida能帮助您简化系统间消息通知，助力您提升开发效率。如果您对kkbida项目有好的建议与意见，欢迎到<a href="https://gitee.com/kekingcn/kkbida/issues">issue区</a>讨论，同时欢迎开发者提交<a href="https://gitee.com/kekingcn/kkbida/pulls">pr</a>参与项目贡献</p>
+<h2 id="作者简介">作者简介</h2>
+<p>陈精华，2018年8月加入凯京科技。kkbida项目开发者，任职于凯京研发中心架构组，参与凯京科技统一支付平台、结算平台设计和开发，负责凯京科技开源中间件开发与维护。<br>
+欢迎加入凯京开源技术QQ群：613025121，和我们一起交流互联网应用的技术架构落地实践<br>
+<img src="https://gitchenjh.github.io/post-images/1565150611634.png" alt=""></p>
+<h2 id="关于架构运维部">关于架构&amp;运维部</h2>
+<p>凯京研发中心架构&amp;运维部的工作主要分两大部分，架构组主要负责框架中间件的研究，如dubbo、apollo、skywalking、xxljob、分布式事务等、公司内<a href="https://gitee.com/kekingcn">开源项目</a>以及公共服务公共组件的研发维护、新技术的引进以及落地等。运维组主要负责devops系统研发以及k8s容器环境的维护等工作。</p>
+<h2 id="架构组招聘">架构组招聘</h2>
+<p>目前架构组还有两个虚位以待，欢迎志同道合的你来和我们一起交流。简历可发送至邮箱：<br>
+chenkailing@keking.cn</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E9%A1%B9%E7%9B%AE%E7%AE%80%E4%BB%8B">项目简介</a></li>
+<li><a href="#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B">快速开始</a></li>
+<li><a href="#%E5%8A%9F%E8%83%BD%E4%BB%8B%E7%BB%8D">功能介绍</a></li>
+<li><a href="#%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90">原理解析</a>
+<ul>
+<li><a href="#1-%E4%BB%A3%E7%A0%81%E6%80%BB%E4%BD%93%E7%BB%93%E6%9E%84">1. 代码总体结构</a></li>
+<li><a href="#2-sdk">2. sdk</a></li>
+<li><a href="#3-%E4%BB%BB%E5%8A%A1%E9%98%9F%E5%88%97%E5%A4%84%E7%90%86">3. 任务队列处理</a></li>
+<li><a href="#4-webhook">4. webhook</a></li>
+</ul>
+</li>
+<li><a href="#%E7%BB%93%E8%AF%AD">结语</a></li>
+<li><a href="#%E4%BD%9C%E8%80%85%E7%AE%80%E4%BB%8B">作者简介</a></li>
+<li><a href="#%E5%85%B3%E4%BA%8E%E6%9E%B6%E6%9E%84%E8%BF%90%E7%BB%B4%E9%83%A8">关于架构&amp;运维部</a></li>
+<li><a href="#%E6%9E%B6%E6%9E%84%E7%BB%84%E6%8B%9B%E8%81%98">架构组招聘</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://gitchenjh.github.io/post/bin-log-distributor_problem">
+              <h3 class="post-title">
+                bin-log-distributor消费数据丢失问题解决记录
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+   | 
+  <a class="rss" href="https://gitchenjh.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+
+  let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+  // This should probably be throttled.
+  // Especially because it triggers during smooth scrolling.
+  // https://lodash.com/docs/4.17.10#throttle
+  // You could do like...
+  // window.addEventListener("scroll", () => {
+  //    _.throttle(doThatStuff, 100);
+  // });
+  // Only not doing it here to keep this Pen dependency-free.
+
+  window.addEventListener("scroll", event => {
+    let fromTop = window.scrollY;
+
+    mainNavLinks.forEach((link, index) => {
+      let section = document.getElementById(decodeURI(link.hash).substring(1));
+      let nextSection = null
+      if (mainNavLinks[index + 1]) {
+        nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+      }
+      console.log('section.offsetHeight', section.offsetHeight);
+      if (section.offsetTop <= fromTop) {
+        if (nextSection) {
+          if (nextSection.offsetTop > fromTop) {
+            link.classList.add("current");
+          } else {
+            link.classList.remove("current");    
+          }
+        } else {
+          link.classList.add("current");
+        }
+      } else {
+        link.classList.remove("current");
+      }
+    });
+  });
+
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>
