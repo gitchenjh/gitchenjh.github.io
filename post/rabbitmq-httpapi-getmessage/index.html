@@ -1,0 +1,286 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RabbitMQ通过HTTP API获取队列消息内容 | gitchenjh 博客</title>
+<meta name="description" content="" />
+<link rel="shortcut icon" href="https://gitchenjh.github.io/favicon.ico?v=1565150193584">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://gitchenjh.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://gitchenjh.github.io">
+  <img class="avatar" src="https://gitchenjh.github.io/images/avatar.png?v=1565150193584" alt="">
+  </a>
+  <h1 class="site-title">
+    gitchenjh 博客
+  </h1>
+  <p class="site-description">
+    
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/gitchenjh" target="_blank">
+          <i class="fab fa-github"></i>
+        </a>
+      
+    
+      
+    
+      
+        <a href="https://weibo.com/chenjinghua322" target="_blank">
+          <i class="fab fa-weibo"></i>
+        </a>
+      
+    
+      
+        <a href="https://www.zhihu.com/people/gitchenjh" target="_blank">
+          <i class="fab fa-zhihu"></i>
+        </a>
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              RabbitMQ通过HTTP API获取队列消息内容
+            </h2>
+            <div class="post-info">
+              <span>
+                2019-03-22
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://gitchenjh.github.io/tag/wMuBUsR96" class="post-tag">
+                  # rabbitmq
+                </a>
+              
+                <a href="https://gitchenjh.github.io/tag/kQpYhc5Usl" class="post-tag">
+                  # http
+                </a>
+              
+                <a href="https://gitchenjh.github.io/tag/Ycu0arwnGW" class="post-tag">
+                  # api
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="背景">背景</h2>
+<p>为配合公司数据中台建设，我们对公司内部使用的mysql binlog数据分发中间件（现已开源：https://gitee.com/kekingcn/keking-binlog-distributor ）进行定制化改造，使其能够同时支持redis和rabbitmq两个分发渠道，并能在前端页面监控队列长度、队列消息内容等信息</p>
+<h2 id="需求">需求</h2>
+<p>由于之前已经完成后端分发功能、redis队列监控的开发，目前需要前端同时支持rabbitmq队列监控，并需要能够预览队列中的内容</p>
+<h2 id="方案选择">方案选择</h2>
+<p>要在前端实现显示rabbitmq队列及队列内容，有如下两种实现方案：</p>
+<ul>
+<li>后端主服务使用rabbitmq客户端，使用amqpadmin读取当前vhost下队列列表，注册消费方，消费队列且不发送ACK确认，让其重新入队列</li>
+<li>后端主服务通过rabbitmq提供的HTTP API直接获取队列列表，和队列中的内容（rabbitmq前台管理页面就是通过HTTP API获取的队列列表和获取队列内消息）<br>
+对比两种方案，发现前者存在两点劣势：</li>
+</ul>
+<ol>
+<li>主服务需要额外依赖rabbitmq客户端，且ampqadmin需要有管理员权限的账号和密码</li>
+<li>主服务需要和业务系统同时消费队列数据，编码不当可能给整个系统带来稳定性问题，且消费数据不发送ACK确认应答不太合理<br>
+而且作为对比，HTTP API只需要能登陆rabbitmq管理页面的权限，并且官方前台管理页面已经实现了获取消息功能，不用自己消费队列数据<br>
+综上分析，选择使用HTTP API方式获取队列及队列内容更为合理</li>
+</ol>
+<h2 id="难点分析">难点分析</h2>
+<ul>
+<li>rabbitmq的HTTP API认证方式不明，通过浏览器调试查看官方前台管理页面http请求并不能看出明确的认证信息</li>
+<li>rabbitmq的HTTP API获取消息接口获取到的数据是base64编码的字符串，我们在消息中传输的是java实体对象，base64编码转二进制流再反序列化成java实体对象过程可能有障碍。api返回数据如下图所示<br>
+<img src="https://gitchenjh.github.io/post-images/1565149944118.jpg" alt=""></li>
+</ul>
+<h2 id="方案验证">方案验证</h2>
+<ol>
+<li>rabbitmq的HTTP API的认证问题可以通过其官方提供的http-client包解决，只需要添加如下依赖<pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupid&gt;com.rabbitmq&lt;/groupid&gt;
+    &lt;artifactid&gt;http-client&lt;/artifactid&gt;
+    &lt;version&gt;3.1.1.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+然后使用com.rabbitmq.http.client.Client构造方法传入如下apiUrl, username, password三个参数<pre><code class="language-java">new Client(url, username, password);
+</code></pre>
+此client中的http请求对象 <code>private final RestTemplate rt;</code>就可以发送http请求并通过认证</li>
+<li>base64转二进制byte[]可以直接用apache-common-codec包直接解码，依赖如下<pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupid&gt;commons-codec&lt;/groupid&gt;
+    &lt;artifactid&gt;commons-codec&lt;/artifactid&gt;
+    &lt;version&gt;1.12&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+</li>
+</ol>
+<p>直接调用<code>org.apache.commons.codec.binary.Base64.decodeBase64(String base64String)</code>即可将base64编码的字符串转成二进制byte[]数组，至于反序列化，只需要保证和rabbitmq序列化过程对应即可将二进制字节码反序列化为java实体对象</p>
+<h2 id="编码实现">编码实现</h2>
+<p>经过方案验证，编码实现就非常简单了，具体实现如下，重写com.rabbitmq.http.client.Client类，添加如下方法</p>
+<pre><code class="language-java">/**
+  * @param vhost Virtrul Host
+  * @param queuename 队列名
+  * @param count 要取的队列消息数
+  * @return EventBaseDTO实体列表
+  */
+public List&lt;eventbasedto&gt; getMessageList(String vhost, String queuename, long count) throws IOException, ClassNotFoundException {
+    String bodyStr = &quot;{\&quot;count\&quot;:&quot; + count + &quot;,\&quot;requeue\&quot;:true,\&quot;encoding\&quot;:\&quot;base64\&quot;}&quot;;
+    Map&lt;string, string&gt; body = JSON.parseObject(bodyStr, Map.class);
+    final URI uri = uriWithPath(&quot;./queues/&quot; + encodePathSegment(vhost) + &quot;/&quot; + encodePathSegment(queuename) + &quot;/get&quot;);
+    ResponseEntity&lt;list&gt; result= rt.postForEntity(uri, body, List.class);
+    List&lt;eventbasedto&gt; resultList = new ArrayList&amp;lt;&amp;gt;();
+    List list = result.getBody();
+    for (Object entry : list) {
+        if (entry instanceof Map) {
+            String base64Str = ((Map) entry).get(&quot;payload&quot;) == null ? &quot;&quot; : ((Map) entry).get(&quot;payload&quot;).toString();
+            byte[] bytes = Base64.decodeBase64(base64Str);
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            EventBaseDTO dto = (EventBaseDTO) ois.readObject();
+            resultList.add(dto);
+        }
+    }
+    return resultList;
+}
+</code></pre>
+<h2 id="实现效果">实现效果</h2>
+<p>后端提供接口后，完成前端开发，即可实现同时对redis和rabbitmq队列的监控，效果如下图所示<br>
+<img src="https://gitchenjh.github.io/post-images/1565149979431.jpg" alt=""><br>
+此次改进很快也会同步到开源社区版本 https://gitee.com/kekingcn/keking-binlog-distributor ，希望我们的开源项目能反哺社区，为大家工作带来便利</p>
+<h2 id="作者简介">作者简介</h2>
+<p>陈精华，2018年8月加入凯京科技。<a href="https://gitee.com/kekingcn/kkbida">kkbida项目</a>(凯京科技开源消息投递中间件)开发者，任职于凯京研发中心架构组，参与凯京科技统一支付平台、结算平台设计和开发，负责凯京科技开源中间件开发与维护。<br>
+欢迎加入凯京开源技术QQ群：613025121，和我们一起交流互联网应用的技术架构落地实践<br>
+<img src="https://gitchenjh.github.io/post-images/1565150031870.png" alt=""></p>
+<h2 id="关于架构运维部">关于架构&amp;运维部</h2>
+<p>凯京研发中心架构&amp;运维部的工作主要分两大部分，架构组主要负责框架中间件的研究，如dubbo、apollo、skywalking、xxljob、分布式事务等、公司内<a href="https://gitee.com/kekingcn">开源项目</a>以及公共服务公共组件的研发维护、新技术的引进以及落地等。运维组主要负责devops系统研发以及k8s容器环境的维护等工作。</p>
+<h2 id="架构组招聘">架构组招聘</h2>
+<p>目前架构组还有两个虚位以待，欢迎志同道合的你来和我们一起交流。简历可发送至邮箱：<br>
+chenkailing@keking.cn</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E8%83%8C%E6%99%AF">背景</a></li>
+<li><a href="#%E9%9C%80%E6%B1%82">需求</a></li>
+<li><a href="#%E6%96%B9%E6%A1%88%E9%80%89%E6%8B%A9">方案选择</a></li>
+<li><a href="#%E9%9A%BE%E7%82%B9%E5%88%86%E6%9E%90">难点分析</a></li>
+<li><a href="#%E6%96%B9%E6%A1%88%E9%AA%8C%E8%AF%81">方案验证</a></li>
+<li><a href="#%E7%BC%96%E7%A0%81%E5%AE%9E%E7%8E%B0">编码实现</a></li>
+<li><a href="#%E5%AE%9E%E7%8E%B0%E6%95%88%E6%9E%9C">实现效果</a></li>
+<li><a href="#%E4%BD%9C%E8%80%85%E7%AE%80%E4%BB%8B">作者简介</a></li>
+<li><a href="#%E5%85%B3%E4%BA%8E%E6%9E%B6%E6%9E%84%E8%BF%90%E7%BB%B4%E9%83%A8">关于架构&amp;运维部</a></li>
+<li><a href="#%E6%9E%B6%E6%9E%84%E7%BB%84%E6%8B%9B%E8%81%98">架构组招聘</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://gitchenjh.github.io/post/bin-log-distributor_problem">
+              <h3 class="post-title">
+                bin-log-distributor消费数据丢失问题解决记录
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+   | 
+  <a class="rss" href="https://gitchenjh.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+
+  let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+  // This should probably be throttled.
+  // Especially because it triggers during smooth scrolling.
+  // https://lodash.com/docs/4.17.10#throttle
+  // You could do like...
+  // window.addEventListener("scroll", () => {
+  //    _.throttle(doThatStuff, 100);
+  // });
+  // Only not doing it here to keep this Pen dependency-free.
+
+  window.addEventListener("scroll", event => {
+    let fromTop = window.scrollY;
+
+    mainNavLinks.forEach((link, index) => {
+      let section = document.getElementById(decodeURI(link.hash).substring(1));
+      let nextSection = null
+      if (mainNavLinks[index + 1]) {
+        nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+      }
+      console.log('section.offsetHeight', section.offsetHeight);
+      if (section.offsetTop <= fromTop) {
+        if (nextSection) {
+          if (nextSection.offsetTop > fromTop) {
+            link.classList.add("current");
+          } else {
+            link.classList.remove("current");    
+          }
+        } else {
+          link.classList.add("current");
+        }
+      } else {
+        link.classList.remove("current");
+      }
+    });
+  });
+
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>
