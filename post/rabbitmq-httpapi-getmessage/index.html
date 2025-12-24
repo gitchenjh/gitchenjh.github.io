@@ -112,7 +112,7 @@
             <div class="post-content-wrapper">
               <div class="post-content">
                 <h2 id="背景">背景</h2>
-<p>为配合公司数据中台建设，我们对公司内部使用的mysql binlog数据分发中间件（现已开源：https://gitee.com/kekingcn/keking-binlog-distributor ）进行定制化改造，使其能够同时支持redis和rabbitmq两个分发渠道，并能在前端页面监控队列长度、队列消息内容等信息</p>
+<p>为配合公司数据中台建设，我们对公司内部使用的mysql binlog数据分发中间件（现已开源：https://gitee.com/kekingcn/kkbinlog ）进行定制化改造，使其能够同时支持redis和rabbitmq两个分发渠道，并能在前端页面监控队列长度、队列消息内容等信息</p>
 <h2 id="需求">需求</h2>
 <p>由于之前已经完成后端分发功能、redis队列监控的开发，目前需要前端同时支持rabbitmq队列监控，并需要能够预览队列中的内容</p>
 <h2 id="方案选择">方案选择</h2>
@@ -185,7 +185,7 @@ public List&lt;eventbasedto&gt; getMessageList(String vhost, String queuename, l
 <h2 id="实现效果">实现效果</h2>
 <p>后端提供接口后，完成前端开发，即可实现同时对redis和rabbitmq队列的监控，效果如下图所示<br>
 <img src="https://gitchenjh.github.io/post-images/1565149979431.jpg" alt=""><br>
-此次改进很快也会同步到开源社区版本 https://gitee.com/kekingcn/keking-binlog-distributor ，希望我们的开源项目能反哺社区，为大家工作带来便利</p>
+此次改进很快也会同步到开源社区版本 https://gitee.com/kekingcn/kkbinlog ，希望我们的开源项目能反哺社区，为大家工作带来便利</p>
 <h2 id="作者简介">作者简介</h2>
 <p>陈精华，2018年8月加入凯京科技。<a href="https://gitee.com/kekingcn/kkbida">kkbida项目</a>(凯京科技开源消息投递中间件)开发者，任职于凯京研发中心架构组，参与凯京科技统一支付平台、结算平台设计和开发，负责凯京科技开源中间件开发与维护。<br>
 欢迎加入凯京开源技术QQ群：613025121，和我们一起交流互联网应用的技术架构落地实践<br>
